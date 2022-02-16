@@ -4,14 +4,15 @@
 #include <conio.h>
 #include <stdio.h>
 #include <string> 
+#include <tchar.h>
+#include <thread>
 //#include "ansi_escape_codes.hpp" //
 // General form for ANSI escape codes \ESC[code Your output \ESC[m // 
 
 using namespace std; 
 // using namespace ansi_escape_codes; //
-
 bool isGameRunning = false;
-
+bool isEnemyOnScreen = false;
 // Grid Dimensions 
 int xAxis = 25;
 int yAxis = 25;
@@ -31,11 +32,11 @@ void countScore(int score) {
 }
 
 // Creating User Grid and handling user input 
+int userGrid[25][25];
 
 void createGrid() {
     bool isGameRunning = true;
     int player = 1;
-    int userGrid[xAxis][yAxis];
 
     for (int i = 0; i < xAxis; i++) {
         for (int j = 0; j < yAxis; j++) {
@@ -50,8 +51,7 @@ void createGrid() {
         }
         cout << "\n";
     }
-    
-    for (;;) {
+    while (isGameRunning = true) {
         char userMovement = getch();
         if (userMovement == 'a') {
             userxValue = userxValue -1;
@@ -81,7 +81,26 @@ void createGrid() {
     // Note to self, separate the function which creates the grid, and the one that handles the input  
 }
 
-// Setting up instructions, and allowing the use to start the game when they would like 
+void generateEnemies() {
+    int randomxCoord = rand()%(25 - 1 + 1) + 1;
+    cout << "Enemy Generated" << endl;
+    int enemy = 2;
+    int startingposyEnemy = 10;
+    userGrid[startingposyEnemy][randomxCoord] = enemy;
+    createGrid();
+    bool isEnemyOnScreen = true;
+    while (isEnemyOnScreen == true) {
+        Sleep(1000);
+        startingposyEnemy- 1;
+        userGrid[startingposyEnemy][randomxCoord] = enemy;
+    }
+    if (startingposyEnemy < 25) {
+        generateEnemies();
+    }
+}
+
+
+// Setting up ins, and allowing the use to start the game when they would like 
 
 void instructions() {
     cout << "Welcome to Deepinder's Racing Game" << endl;
@@ -92,6 +111,8 @@ void instructions() {
     char input = getch();
     if (input == 'y') {
     createGrid();
+    std::thread y(generateEnemies);
+    y.detach();
     countScore(score);
     }
 }
@@ -99,7 +120,5 @@ void instructions() {
 // Main Function 
 
 int main() {
-    system("COLOR F2");
-    system("COLOR 60");
     instructions();
 }
